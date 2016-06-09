@@ -74,6 +74,20 @@ namespace WooCommerceNET.WooCommerce
             return await API.SendHttpClientRequest("customers/" + id.ToString(), RequestMethod.POST, c, parms);
         }
 
+        public async Task<Customer> CreateOrUpdateCustomer(Customer c, int id = 0)
+        {
+            string json;
+
+            if (id == 0)
+                json = await PostCustomer(c);
+            else
+                json = await UpdateCustomer(id, c);
+
+            json = json.Substring(json.IndexOf(':') + 1, json.Length - json.IndexOf(':') - 2);
+
+            return RestAPI.DeserializeJSon<Customer>(json);
+        }
+
         public async Task<string> UpdateCustomers(Customer[] cs, Dictionary<string, string> parms = null)
         {
             return await API.SendHttpClientRequest("customers/bulk", RequestMethod.POST, cs, parms);
@@ -236,6 +250,20 @@ namespace WooCommerceNET.WooCommerce
             return await API.SendHttpClientRequest("products/" + productid.ToString(), RequestMethod.PUT, p, parms);
         }
 
+        public async Task<Product> CreateOrUpdateProduct(Product p, int id = 0)
+        {
+            string json;
+
+            if (id == 0)
+                json = await PostProduct(p);
+            else
+                json = await UpdateProduct(id, p);
+
+            json = json.Substring(json.IndexOf(':') + 1, json.Length - json.IndexOf(':') - 2);
+
+            return RestAPI.DeserializeJSon<Product>(json);
+        }
+
         public async Task<string> UpdateProducts(Product[] ps, Dictionary<string, string> parms = null)
         {
             return await API.SendHttpClientRequest("products/bulk", RequestMethod.PUT, ps, parms);
@@ -379,6 +407,30 @@ namespace WooCommerceNET.WooCommerce
         {
             string json = await API.SendHttpClientRequest("webhooks/" + id.ToString(), RequestMethod.GET, string.Empty, parms);
             json = json.Substring(json.IndexOf(':') + 1, json.Length - json.IndexOf(':') - 2);
+            return RestAPI.DeserializeJSon<Webhook>(json);
+        }
+
+        public async Task<string> PostWebhook(Webhook w, Dictionary<string, string> parms = null)
+        {
+            return await API.SendHttpClientRequest("webhooks", RequestMethod.POST, w, parms);
+        }
+
+        public async Task<string> UpdateWebhook(int id, Webhook w, Dictionary<string, string> parms = null)
+        {
+            return await API.SendHttpClientRequest("webhooks/" + id.ToString(), RequestMethod.PUT, w, parms);
+        }
+
+        public async Task<Webhook> CreateOrUpdateWebhook(Webhook w, int id = 0)
+        {
+            string json;
+
+            if (id == 0)
+                json = await PostWebhook(w);
+            else
+                json = await UpdateWebhook(id, w);
+
+            json = json.Substring(json.IndexOf(':') + 1, json.Length - json.IndexOf(':') - 2);
+
             return RestAPI.DeserializeJSon<Webhook>(json);
         }
 

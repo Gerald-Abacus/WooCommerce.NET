@@ -236,7 +236,7 @@ namespace WooCommerceNET.WooCommerce
         /// List of the product dimensions. See Dimensions Properties
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public DimensionList dimensions { get; set; }
+        public Dimension dimensions { get; set; }
 
         /// <summary>
         /// Shows if the product need to be shipped or not 
@@ -586,6 +586,12 @@ namespace WooCommerceNET.WooCommerce
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
         public List<string> options { get; set; }
+
+        /// <summary>
+        /// The selected option for a variation
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public string option { get; set; }
     }
 
 

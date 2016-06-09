@@ -41,12 +41,21 @@ namespace WooCommerceNET
         public async Task<string> SendHttpClientRequest<T>(string endpoint, RequestMethod method, T requestBody, Dictionary<string, string> parms = null)
         {
             HttpWebRequest httpWebRequest = null;
+            WebException webException;
+
             try
             {
                 httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(wc_url + GetOAuthEndPoint(method.ToString(), endpoint, parms));
                 if (wc_url.StartsWith("https", StringComparison.OrdinalIgnoreCase))
                 {
-                    httpWebRequest.Credentials = new NetworkCredential(wc_key, wc_secret);
+                    //httpWebRequest.Credentials = new NetworkCredential(wc_key, wc_secret);
+                    //Authentication is broken so this is the only way that works.
+                    if (parms == null)
+                        parms = new Dictionary<string, string>();
+                    parms["consumer_key"] = wc_key;
+                    parms["consumer_secret"] = wc_secret;
+                    var paramString = String.Join("&", parms.Select(kv => kv.Key + "=" + kv.Value));
+                    httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(wc_url + endpoint + "?" + paramString );                    
                 }
 
                 // start the stream immediately
@@ -73,7 +82,7 @@ namespace WooCommerceNET
             {
                 if (httpWebRequest != null && httpWebRequest.HaveResponse)
                     if (we.Response != null)
-                        throw new Exception(await GetStreamContent(we.Response.GetResponseStream(), we.Response.ContentType.Split('=')[1]));
+                        webException = we;
                     else
                         throw we;
                 else
@@ -83,6 +92,13 @@ namespace WooCommerceNET
             {
                 return e.Message;
             }
+
+            if (webException != null)
+            {
+                throw new Exception(await GetStreamContent(webException.Response.GetResponseStream(), webException.Response.ContentType.Split('=')[1]));
+            }
+
+            return "";
         }
 
         public async Task<string> GetRestful(string endpoint, Dictionary<string, string> parms = null)
